@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserEntity } from './users.entity';
+import { UserEntity } from './types/users.entity';
 import { prisma } from 'src/prisma/prisma.hooks';
 import { UserDTO } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
@@ -13,16 +13,33 @@ export class UsersService {
     this.prisma = prisma;
   }
 
-  findOneUser(username: string): Promise<UserEntity> | undefined {
+  findOneUser(id: string): Promise<UserEntity> | undefined {
     return this.prisma.users.findFirst({
       where: {
-        username,
+        id,
+      },
+      select: {
+        id: true,
+        password: false,
+        username: true,
+        fullname: true,
+        email: true,
       },
     });
   }
 
-  getAllData(): Promise<UserEntity[]> {
-    return this.prisma.users.findMany();
+  async getAllData(): Promise<UserEntity[]> {
+    return this.prisma.users.findMany({
+      select: {
+        username: true,
+        password: false,
+        profile_image_url: true,
+        fullname: true,
+        email: true,
+        id: true,
+        age: true,
+      },
+    });
   }
 
   async saveData(payload: UserDTO): Promise<UserEntity> {

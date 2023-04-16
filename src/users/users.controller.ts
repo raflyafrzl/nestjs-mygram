@@ -1,31 +1,42 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   UseFilters,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { CustomExceptionFilter } from 'src/exception/CustomException';
-import { ExceptionFilter } from 'src/exception/Exception';
 import { UsersService } from './users.service';
-import { UserEntity } from './users.entity';
+import { GuardValidation } from 'src/guards/guards.guard';
+import { UserEntity } from './types/users.entity';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private exceptionCustom: CustomExceptionFilter,
-    private userService: UsersService,
-  ) {}
+  constructor(private userService: UsersService) {}
 
   @Get('/')
-  async getAllData(): Promise<UserEntity[]> {
+  @UseGuards(GuardValidation)
+  async getAllData() {
     const result: UserEntity[] = await this.userService.getAllData();
+
+    return result;
+  }
+
+  @Get(':id')
+  @UseGuards(GuardValidation)
+  @UseFilters(CustomExceptionFilter)
+  async findOneUser(@Param('id') id: string): Promise<UserEntity> {
+    const result = await this.userService.findOneUser(id);
+
+    if (!result) {
+      throw new BadRequestException('User not found, please input a valid ID');
+    }
 
     return result;
   }
