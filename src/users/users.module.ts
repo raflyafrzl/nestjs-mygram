@@ -6,5 +6,6 @@ import { CustomExceptionFilter } from 'src/exception/CustomException';
 @Module({
   controllers: [UsersController],
   providers: [UsersService, CustomExceptionFilter],
+  exports: [UsersService],
 })
 export class UsersModule {}

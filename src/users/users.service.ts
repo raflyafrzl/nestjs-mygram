@@ -13,17 +13,16 @@ export class UsersService {
     this.prisma = prisma;
   }
 
-  getAllData(): Promise<UserEntity[]> {
-    return this.prisma.users.findMany({
-      select: {
-        password: false,
-        email: true,
-        username: true,
-        fullname: true,
-        age: true,
-        profile_image_url: true,
+  findOneUser(username: string): Promise<UserEntity> | undefined {
+    return this.prisma.users.findFirst({
+      where: {
+        username,
       },
     });
+  }
+
+  getAllData(): Promise<UserEntity[]> {
+    return this.prisma.users.findMany();
   }
 
   async saveData(payload: UserDTO): Promise<UserEntity> {
