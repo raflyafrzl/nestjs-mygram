@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Req,
   UseFilters,
   UseGuards,
   UsePipes,
@@ -15,6 +16,7 @@ import { CustomExceptionFilter } from 'src/exception/CustomException';
 import { UsersService } from './users.service';
 import { GuardValidation } from 'src/guards/guards.guard';
 import { UserEntity } from './types/users.entity';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -31,7 +33,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(GuardValidation)
   @UseFilters(CustomExceptionFilter)
-  async findOneUser(@Param('id') id: string): Promise<UserEntity> {
+  async findOneUser(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ): Promise<UserEntity> {
     const result = await this.userService.findOneUser(id);
 
     if (!result) {
